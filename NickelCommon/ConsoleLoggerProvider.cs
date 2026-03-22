@@ -44,6 +44,7 @@ public sealed class ConsoleLoggerProvider(LogLevel level, TextWriter textWriter,
 			{
 				if (!this.IsEnabled(logLevel))
 					return;
+
 				var logColor = GetLogLevelConsoleColors(logLevel);
 
 				var oldBackgroundColor = Console.BackgroundColor;

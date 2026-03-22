@@ -11,12 +11,16 @@
 	<PropertyGroup>
 		<RootNamespace>$(_ModLoaderName)</RootNamespace>
 		<Version>$(NickelVersion)</Version>
-		<OutputType>Exe</OutputType>
-		<ApplicationIcon>../Icon.ico</ApplicationIcon>
-		<ApplicationManifest>../app.manifest</ApplicationManifest>
+		<OutputType Condition="'$(TargetFramework)' != 'net10.0-android36.1'">Exe</OutputType>
+		<OutputType Condition="'$(TargetFramework)' == 'net10.0-android36.1'">Library</OutputType>
+		<ApplicationIcon Condition="'$(TargetFramework)' != 'net10.0-android36.1'">../Icon.ico</ApplicationIcon>
+		<ApplicationManifest Condition="'$(TargetFramework)' != 'net10.0-android36.1'">../app.manifest</ApplicationManifest>
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 		<NoWarn>$(NoWarn);CS0436</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DefineConstants>NICKEL_KYANITE</DefineConstants>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<SatelliteResourceLanguages>none</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -64,7 +68,7 @@
 		<Reference Condition="!'$(UseReferenceAssembly)'" Include="CobaltCore" HintPath="$(IntermediateOutputPath)/CobaltCore.dll" Private="False" />
 		<PackageReference Include="SingleFileExtractor.Core" Version="2.2.1" />
 		<PackageReference Include="ValveKeyValue" Version="0.13.1.398" />
-		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
+		<PackageReference Include="MonoGame.Framework.Android" Version="3.8.2.1105" />
 
 		<!-- mod management -->
 		<PackageReference Include="Lib.Harmony.Thin" Version="2.4.2" />

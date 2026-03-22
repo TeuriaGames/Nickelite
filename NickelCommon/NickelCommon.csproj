@@ -4,6 +4,7 @@
 		<RootNamespace>Nickel.Common</RootNamespace>
 		<Version>$(NickelVersion)</Version>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DefineConstants>NICKEL_KYANITE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\PluginManager\PluginManager.csproj" />

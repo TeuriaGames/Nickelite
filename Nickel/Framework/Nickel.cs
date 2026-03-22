@@ -35,8 +35,16 @@ internal sealed partial class Nickel(
 
 	internal static int Main(string[] args)
 	{
+#if NICKEL_KYANITE
+		return CreateAndStartInstance(new LaunchArguments()
+		{
+			InitSteam = false
+		}, Stopwatch.StartNew());
+#endif
+#pragma warning disable CS0162 // Unreachable code detected
 		var stopwatch = Stopwatch.StartNew();
-		
+#pragma warning restore CS0162 // Unreachable code detected
+
 		var vanillaOption = new Option<bool>("--vanilla", () => false, "Whether to run the vanilla game instead.") { Arity = ArgumentArity.ZeroOrOne };
 		var debugOption = new Option<bool?>("--debug", "Whether the game should be ran in debug mode.");
 		var saveInDebugOption = new Option<bool?>("--saveInDebug", "Whether the game should be auto-saved even in debug mode.");
@@ -110,19 +118,22 @@ internal sealed partial class Nickel(
 		var modStorageDirectory = launchArguments.ModStoragePath ?? new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CobaltCore", NickelConstants.Name, "ModStorage"));
 
 		Settings settings;
+#pragma warning disable CS0168 // Variable is declared but never used
 		try
 		{
 			settings = SettingsUtilities.ReadSettings<Settings>(new DirectoryInfoImpl(modStorageDirectory), true) ?? throw new InvalidDataException();
 		}
 		catch (Exception ex)
 		{
+#if !NICKEL_KYANITE
 			Console.WriteLine(NickelConstants.IntroMessage);
 			Console.WriteLine($"ModStoragePath: {PathUtilities.SanitizePath(modStorageDirectory.FullName)}");
 			Console.WriteLine(ex);
+#endif
 			return -1;
 		}
-		
-		var realOut = Console.Out;
+#pragma warning restore CS0168 // Variable is declared but never used
+
 		var loggerFactory = LoggerFactory.Create(builder =>
 		{
 			if (string.IsNullOrEmpty(launchArguments.LogPipeName))
@@ -131,7 +142,9 @@ internal sealed partial class Nickel(
 				var fileLogDirectory = launchArguments.LogPath ?? GetOrCreateDefaultLogDirectory();
 				var timestampedLogFiles = launchArguments.TimestampedLogFiles ?? false;
 				builder.AddProvider(FileLoggerProvider.CreateNewLog(settings.MinimumFileLogLevel, fileLogDirectory, timestampedLogFiles));
+#if !NICKEL_KYANITE
 				builder.AddProvider(new ConsoleLoggerProvider(settings.MinimumConsoleLogLevel, realOut, disposeWriter: false));
+#endif
 			}
 			else
 			{
@@ -140,8 +153,11 @@ internal sealed partial class Nickel(
 			}
 		});
 		var logger = loggerFactory.CreateLogger(NickelConstants.Name);
+#if !NICKEL_KYANITE
+		var realOut = Console.Out;
 		Console.SetOut(new LoggerTextWriter(logger, LogLevel.Information, realOut));
 		Console.SetError(new LoggerTextWriter(logger, LogLevel.Error, Console.Error));
+#endif
 		logger.LogInformation("{IntroMessage}", NickelConstants.IntroMessage);
 		
 		logger.LogInformation("ModStoragePath: {Path}", PathUtilities.SanitizePath(modStorageDirectory.FullName));
@@ -434,8 +450,10 @@ internal sealed partial class Nickel(
 				instance.ModManager.LogHarmonyPatchesOnce();
 				instance.ModManager.EventManager.OnGameClosingEvent.Raise(null, e);
 			}
+#if !NICKEL_KYANITE
 			if (instance.LaunchArguments.LogPipeName is null)
 				Console.ReadLine();
+#endif
 			return 1;
 		}
 		finally
