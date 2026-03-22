@@ -21,6 +21,7 @@
 		<DefineConstants>NICKEL_KYANITE</DefineConstants>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+		<TieredCompilation>false</TieredCompilation>
 	</PropertyGroup>
 
 	<PropertyGroup>

@@ -45,6 +45,16 @@ public sealed class ConsoleLoggerProvider(LogLevel level, TextWriter textWriter,
 				if (!this.IsEnabled(logLevel))
 					return;
 
+#if NICKEL_KYANITE
+				Android.Util.Log.Error(categoryName, formatter(state, exception));
+				textWriter.Write('[');
+				textWriter.Write(']');
+
+				textWriter.Write($"[{categoryName}]");
+				textWriter.Write($" {formatter(state, exception)}");
+				textWriter.WriteLine();
+#else
+
 				var logColor = GetLogLevelConsoleColors(logLevel);
 
 				var oldBackgroundColor = Console.BackgroundColor;
@@ -71,6 +81,7 @@ public sealed class ConsoleLoggerProvider(LogLevel level, TextWriter textWriter,
 					Console.BackgroundColor = oldBackgroundColor;
 					Console.ForegroundColor = oldForegroundColor;
 				}
+#endif
 			}
 		}
 

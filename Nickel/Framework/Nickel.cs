@@ -38,7 +38,8 @@ internal sealed partial class Nickel(
 #if NICKEL_KYANITE
 		return CreateAndStartInstance(new LaunchArguments()
 		{
-			InitSteam = false
+			InitSteam = false,
+			GamePath = new FileInfo(args[0])
 		}, Stopwatch.StartNew());
 #endif
 #pragma warning disable CS0162 // Unreachable code detected
@@ -134,6 +135,7 @@ internal sealed partial class Nickel(
 		}
 #pragma warning restore CS0168 // Variable is declared but never used
 
+		var realOut = Console.Out;
 		var loggerFactory = LoggerFactory.Create(builder =>
 		{
 			if (string.IsNullOrEmpty(launchArguments.LogPipeName))
@@ -142,9 +144,7 @@ internal sealed partial class Nickel(
 				var fileLogDirectory = launchArguments.LogPath ?? GetOrCreateDefaultLogDirectory();
 				var timestampedLogFiles = launchArguments.TimestampedLogFiles ?? false;
 				builder.AddProvider(FileLoggerProvider.CreateNewLog(settings.MinimumFileLogLevel, fileLogDirectory, timestampedLogFiles));
-#if !NICKEL_KYANITE
 				builder.AddProvider(new ConsoleLoggerProvider(settings.MinimumConsoleLogLevel, realOut, disposeWriter: false));
-#endif
 			}
 			else
 			{
@@ -154,7 +154,6 @@ internal sealed partial class Nickel(
 		});
 		var logger = loggerFactory.CreateLogger(NickelConstants.Name);
 #if !NICKEL_KYANITE
-		var realOut = Console.Out;
 		Console.SetOut(new LoggerTextWriter(logger, LogLevel.Information, realOut));
 		Console.SetError(new LoggerTextWriter(logger, LogLevel.Error, Console.Error));
 #endif
